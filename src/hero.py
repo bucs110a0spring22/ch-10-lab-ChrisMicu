@@ -19,7 +19,10 @@ class Hero(pygame.sprite.Sprite):
         #set other attributes
         self.name = name
         self.speed = 3
-        self.health = 3
+        self.health = 10
+
+        
+
 
     #methods to make moving our hero easier
     def move_up(self):
@@ -32,10 +35,15 @@ class Hero(pygame.sprite.Sprite):
         self.rect.x += self.speed
 
     def fight(self, opponent):
-        if(random.randrange(3)):
+        if(random.randrange(10)):
             self.health -= 1
             print("attack failed. Remaining Health: ", self.health)
             return False
         else:
             print("successful attack")
         return True
+    
+
+    def win(self,final):
+      print("Completed!")
+      return True

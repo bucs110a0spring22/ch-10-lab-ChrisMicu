@@ -3,7 +3,7 @@ import pygame
 import random
 from src import hero
 from src import enemy
-
+from src import princess
 
 class Controller:
     def __init__(self, width=640, height=480):
@@ -26,11 +26,22 @@ class Controller:
         self.hero = hero.Hero("Conan", 50, 80, "assets/hero.png")
         self.all_sprites = pygame.sprite.Group((self.hero,) + tuple(self.enemies))
         self.state = "GAME"
+      
+        #add princess
+        self.princess = pygame.sprite.Group()
+        x=random.randrange(100,400)
+        y=random.randrange(100,400)
+        self.princess.add(princess.Princess("win",x,y,'assets/princess.png'))
+          
+        
+        
 
     def mainLoop(self):
         while True:
             if(self.state == "GAME"):
                 self.gameLoop()
+            elif(self.state == "Complete!"):
+              self.autowin()
             elif(self.state == "GAMEOVER"):
                 self.gameOver()
 
@@ -48,6 +59,7 @@ class Controller:
                         self.hero.move_left()
                     elif(event.key == pygame.K_RIGHT):
                         self.hero.move_right()
+              
 
             # check for collisions
             fights = pygame.sprite.spritecollide(self.hero, self.enemies, True)
@@ -58,8 +70,8 @@ class Controller:
                         self.background.fill((250, 250, 250))
                     else:
                         self.background.fill((250, 0, 0))
-                        self.enemies.add(e)
-
+                       
+                    self.enemies.add(e)
             # redraw the entire screen
             self.enemies.update()
             self.screen.blit(self.background, (0, 0))
@@ -70,6 +82,22 @@ class Controller:
             # update the screen
             pygame.display.flip()
 
+          
+            final = pygame.sprite.spritecollide(self.hero,self.princess, True)
+            if (final):
+              for e in final:
+                if (self.hero.win(e)):
+                  e.kill()
+                self.state = "Complete!"
+              self.all_sprites.draw(self.screen)
+   
+    def autowin(self):
+      myfont=pygame.font.SysFont(None,30)
+      message=myfont.render("Complete!", True, (0,0,0))
+      self.screen.blit(message, ((self.width/2,self.height/2,),))
+      pygame.display.flip()
+
+  
     def gameOver(self):
         self.hero.kill()
         myfont = pygame.font.SysFont(None, 30)
@@ -80,3 +108,5 @@ class Controller:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+
+
